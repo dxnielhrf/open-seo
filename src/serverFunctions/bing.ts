@@ -47,3 +47,8 @@ export const getBingReport = createServerFn({ method: "GET" })
   .middleware(requireProjectContext)
   .validator(projectScopedSchema)
   .handler(async ({ context }) => BingService.getReport(context.projectId));
+
+export const getBingBacklinks = createServerFn({ method: "GET" })
+  .middleware(requireProjectContext)
+  .validator(projectScopedSchema)
+  .handler(async ({ context }) => BingService.getBacklinks(context.projectId));

@@ -1,5 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getBingConnection, getBingReport } from "@/serverFunctions/bing";
+import {
+  getBingBacklinks,
+  getBingConnection,
+  getBingReport,
+} from "@/serverFunctions/bing";
 
 // Fork (Bing Webmaster Tools).
 export const bingConnectionOptions = (projectId: string) =>
@@ -14,4 +18,12 @@ export const bingReportOptions = (projectId: string) =>
     queryKey: ["bingReport", projectId],
     queryFn: () => getBingReport({ data: { projectId } }),
     staleTime: 10 * 60_000,
+  });
+
+// Up to 11 Bing calls per load; links change slowly.
+export const bingBacklinksOptions = (projectId: string) =>
+  queryOptions({
+    queryKey: ["bingBacklinks", projectId],
+    queryFn: () => getBingBacklinks({ data: { projectId } }),
+    staleTime: 30 * 60_000,
   });

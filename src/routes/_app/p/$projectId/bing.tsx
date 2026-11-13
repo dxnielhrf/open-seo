@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CardShell } from "@/client/components/CardShell";
 import { BingReportBody } from "@/client/features/bing/BingCard";
+import { BingBacklinksCard } from "@/client/features/bing/BingBacklinksCard";
 import { bingReportOptions } from "@/client/features/bing/bingQueries";
 import { pageHead } from "@/client/lib/pageHead";
 import { queryClient } from "@/client/tanstack-db/queryClient";
@@ -37,6 +38,7 @@ function BingRoute() {
             topRows={10}
           />
         </CardShell>
+        <BingBacklinksCard projectId={projectId} />
       </div>
     </div>
   );

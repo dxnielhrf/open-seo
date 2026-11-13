@@ -8,7 +8,9 @@ export type BingMethod =
   | "GetRankAndTrafficStats"
   | "GetQueryStats"
   | "GetPageStats"
-  | "GetCrawlStats";
+  | "GetCrawlStats"
+  | "GetLinkCounts"
+  | "GetUrlLinks";
 
 export class BingApiError extends Error {
   constructor(
@@ -28,8 +30,9 @@ export async function callBing(
   method: BingMethod,
   apiKey: string,
   siteUrl?: string,
+  extra: Record<string, string> = {},
 ): Promise<unknown> {
-  const params = new URLSearchParams({ apikey: apiKey });
+  const params = new URLSearchParams({ apikey: apiKey, ...extra });
   if (siteUrl) params.set("siteUrl", siteUrl);
   let response: Response;
   try {

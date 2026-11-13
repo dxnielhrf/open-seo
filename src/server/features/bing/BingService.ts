@@ -205,13 +205,39 @@ function topRows(rows: z.infer<typeof statRowSchema>[], from: string) {
  * the latest crawl snapshot. Each Bing method is fetched on its own, so one
  * failing leaves the others; a rejected key fails the whole report.
  */
-async function getReport(projectId: string, today = new Date()) {
+async function openConnection(projectId: string) {
   const connection = await BingConnectionRepository.getByProjectId(projectId);
-  if (!connection) return { connected: false as const };
+  if (!connection) return null;
   const apiKey = await symmetricDecrypt({
     key: await getEncryptionKey(),
     data: connection.encryptedApiKey,
   });
+  return { siteUrl: connection.siteUrl, apiKey };
+}
+
+/** Runs Bing calls side by side; a failed call yields null and an error. */
+async function settleCalls(calls: Promise<unknown>[]) {
+  const settled = await Promise.allSettled(calls);
+  const errors: string[] = [];
+  let invalidKey = false;
+  const payloads = settled.map((result) => {
+    if (result.status === "fulfilled") return result.value;
+    if (result.reason instanceof BingApiError) {
+      if (result.reason.kind === "invalid_key") invalidKey = true;
+      if (!errors.includes(result.reason.message))
+        errors.push(result.reason.message);
+    } else {
+      errors.push("Bing request failed");
+    }
+    return null;
+  });
+  return { payloads, errors, invalidKey };
+}
+
+async function getReport(projectId: string, today = new Date()) {
+  const connection = await openConnection(projectId);
+  if (!connection) return { connected: false as const };
+  const { apiKey } = connection;
 
   const methods = [
     "GetRankAndTrafficStats",
@@ -219,21 +245,9 @@ async function getReport(projectId: string, today = new Date()) {
     "GetPageStats",
     "GetCrawlStats",
   ] as const satisfies BingMethod[];
-  const settled = await Promise.allSettled(
+  const { payloads, errors, invalidKey } = await settleCalls(
     methods.map((method) => callBing(method, apiKey, connection.siteUrl)),
   );
-  const errors: string[] = [];
-  let invalidKey = false;
-  const payloads = settled.map((result, index) => {
-    if (result.status === "fulfilled") return result.value;
-    if (result.reason instanceof BingApiError) {
-      if (result.reason.kind === "invalid_key") invalidKey = true;
-      errors.push(result.reason.message);
-    } else {
-      errors.push(`Bing ${methods[index]}: failed`);
-    }
-    return null;
-  });
   const [traffic, queries, pages, crawl] = [
     parseRows(statRowSchema, payloads[0]),
     parseRows(statRowSchema, payloads[1]),
@@ -298,6 +312,81 @@ async function getReport(projectId: string, today = new Date()) {
   };
 }
 
+const LINK_TARGETS = 10;
+const linkCountsSchema = z.looseObject({
+  Links: z
+    .array(z.looseObject({ Url: z.string(), Count: z.number().optional() }))
+    .optional(),
+});
+const linkDetailsSchema = z.looseObject({
+  Details: z
+    .array(z.looseObject({ Url: z.string(), AnchorText: z.string().nullish() }))
+    .optional(),
+});
+
+/**
+ * Inbound links Bing knows of: the site's pages with their link counts, and
+ * for the 10 most linked pages the linking URLs with anchor text, summed per
+ * referring domain. Only the first result page of each Bing call is read.
+ */
+async function getBacklinks(projectId: string) {
+  const connection = await openConnection(projectId);
+  if (!connection) return { connected: false as const };
+  const { apiKey, siteUrl } = connection;
+
+  const counts = await settleCalls([
+    callBing("GetLinkCounts", apiKey, siteUrl, { page: "0" }),
+  ]);
+  const parsedCounts = linkCountsSchema.safeParse(counts.payloads[0]);
+  const targets = sort(
+    (parsedCounts.success ? (parsedCounts.data.Links ?? []) : []).map(
+      (link) => ({ url: link.Url, count: link.Count ?? 0 }),
+    ),
+    (a, b) => b.count - a.count,
+  );
+
+  const details = await settleCalls(
+    targets.slice(0, LINK_TARGETS).map((target) =>
+      callBing("GetUrlLinks", apiKey, siteUrl, {
+        link: target.url,
+        page: "0",
+      }),
+    ),
+  );
+  const links = details.payloads.flatMap((payload, index) => {
+    const parsed = linkDetailsSchema.safeParse(payload);
+    const target = targets[index]?.url ?? "";
+    return (parsed.success ? (parsed.data.Details ?? []) : []).map(
+      (detail) => ({
+        source: detail.Url,
+        sourceDomain: hostOf(detail.Url),
+        target,
+        anchorText: detail.AnchorText?.trim() || null,
+      }),
+    );
+  });
+
+  const byDomain = new Map<string, number>();
+  for (const link of links) {
+    byDomain.set(link.sourceDomain, (byDomain.get(link.sourceDomain) ?? 0) + 1);
+  }
+  const domains = sort(
+    [...byDomain].map(([domain, count]) => ({ domain, links: count })),
+    (a, b) => b.links - a.links || a.domain.localeCompare(b.domain),
+  );
+
+  return {
+    connected: true as const,
+    siteUrl,
+    invalidKey: counts.invalidKey || details.invalidKey,
+    errors: [...new Set([...counts.errors, ...details.errors])],
+    totalLinks: targets.reduce((sum, target) => sum + target.count, 0),
+    targets,
+    domains,
+    links,
+  };
+}
+
 export type BingReport = Awaited<ReturnType<typeof getReport>>;
 
 export const BingService = {
@@ -305,4 +394,5 @@ export const BingService = {
   getStatus,
   disconnect,
   getReport,
+  getBacklinks,
 };

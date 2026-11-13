@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import type { SortingState, Updater } from "@tanstack/react-table";
 import { BackLink, PageHeader } from "@/client/components/PageHeader";
+import { BingBacklinksCard } from "@/client/features/bing/BingBacklinksCard";
 import { BacklinksSearchCard } from "./BacklinksSearchCard";
 import { BacklinksBody } from "./BacklinksPageContent";
 import type { BacklinksPageProps } from "./backlinksPageTypes";
@@ -138,6 +139,9 @@ export function BacklinksPage({
             addSearch({ target: values.target, scope: values.scope });
           }}
         />
+
+        {/* Fork: Bing's inbound links for this project, no credits. */}
+        <BingBacklinksCard projectId={projectId} linkToBingPage />
 
         <BacklinksBody
           projectId={projectId}

@@ -26,14 +26,16 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
 const day = (iso: string) => `/Date(${Date.parse(`${iso}T00:00:00Z`)})/`;
 
-// Answers each Bing method from `payloads`, an empty list otherwise.
+// Answers each Bing method from `payloads` (keyed "Method" or
+// "Method:link"), an empty list otherwise.
 function respond(payloads: Record<string, unknown>) {
   fetchMock.mockImplementation(async (input) => {
-    const method =
-      new URL(input instanceof Request ? input.url : input).pathname
-        .split("/")
-        .at(-1) ?? "";
-    return json({ d: payloads[method] ?? [] });
+    const url = new URL(input instanceof Request ? input.url : input);
+    const method = url.pathname.split("/").at(-1) ?? "";
+    const link = url.searchParams.get("link");
+    return json({
+      d: payloads[link ? `${method}:${link}` : method] ?? [],
+    });
   });
 }
 
@@ -132,5 +134,58 @@ describe("BingService.getReport", () => {
     const report = await BingService.getReport("p1");
 
     expect(report).toMatchObject({ processing: true, errors: [] });
+  });
+});
+
+describe("BingService.getBacklinks", () => {
+  beforeEach(async () => {
+    await BingService.connect({ ...scope, apiKey: API_KEY });
+    getConnection.mockResolvedValue(upsert.mock.calls[0]?.[0]);
+  });
+
+  it("lists linking URLs of the most linked pages, summed per domain", async () => {
+    respond({
+      GetLinkCounts: {
+        Links: [
+          { Url: "https://www.example.com/a", Count: 1 },
+          { Url: "https://www.example.com/", Count: 2 },
+        ],
+      },
+      "GetUrlLinks:https://www.example.com/": {
+        Details: [
+          { Url: "https://www.blog.org/post", AnchorText: " Example " },
+          { Url: "https://news.net/x", AnchorText: "" },
+        ],
+      },
+      "GetUrlLinks:https://www.example.com/a": {
+        Details: [{ Url: "https://blog.org/other", AnchorText: "A" }],
+      },
+    });
+
+    const result = await BingService.getBacklinks("p1");
+
+    expect(result).toMatchObject({
+      totalLinks: 3,
+      targets: [
+        { url: "https://www.example.com/" },
+        { url: "https://www.example.com/a" },
+      ],
+      domains: [
+        { domain: "blog.org", links: 2 },
+        { domain: "news.net", links: 1 },
+      ],
+      links: [
+        {
+          source: "https://www.blog.org/post",
+          target: "https://www.example.com/",
+          anchorText: "Example",
+        },
+        { source: "https://news.net/x", anchorText: null },
+        {
+          source: "https://blog.org/other",
+          target: "https://www.example.com/a",
+        },
+      ],
+    });
   });
 });
