@@ -111,6 +111,7 @@ export const {
   backlinkSnapshots,
   dataRefreshClaims,
   crawlerCredentials,
+  bingConnections,
   projectContextSections,
   projectCompetitors,
   projectKeyPages,

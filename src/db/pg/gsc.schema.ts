@@ -36,3 +36,23 @@ export const gscConnections = pgTable(
     index("gsc_connections_organization_idx").on(table.organizationId),
   ],
 );
+
+// Fork (Bing Webmaster Tools): see src/db/gsc.schema.ts.
+export const bingConnections = pgTable(
+  "bing_connections",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    siteUrl: text("site_url").notNull(),
+    encryptedApiKey: text("encrypted_api_key").notNull(),
+    connectedByUserId: text("connected_by_user_id").notNull(),
+    createdAt: text("created_at").notNull().default(isoNow),
+    updatedAt: text("updated_at").notNull().default(isoNow),
+  },
+  (table) => [uniqueIndex("bing_connections_project_idx").on(table.projectId)],
+);

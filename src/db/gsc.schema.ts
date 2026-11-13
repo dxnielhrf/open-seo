@@ -37,3 +37,29 @@ export const gscConnections = sqliteTable(
     index("gsc_connections_organization_idx").on(table.organizationId),
   ],
 );
+
+// Fork (Bing Webmaster Tools): one Bing site per project. The API key is
+// encrypted with BETTER_AUTH_SECRET and never returned to the client.
+export const bingConnections = sqliteTable(
+  "bing_connections",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    // As GetUserSites returns it, e.g. "https://example.com/".
+    siteUrl: text("site_url").notNull(),
+    encryptedApiKey: text("encrypted_api_key").notNull(),
+    connectedByUserId: text("connected_by_user_id").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [uniqueIndex("bing_connections_project_idx").on(table.projectId)],
+);

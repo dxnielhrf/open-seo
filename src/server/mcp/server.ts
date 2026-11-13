@@ -34,6 +34,7 @@ import {
   instrumentMcpToolInput,
 } from "@/server/mcp/instrumentation";
 import { submitIndexNowUrlsTool } from "@/server/mcp/tools/submit-indexnow-urls";
+import { getBingPerformanceTool } from "@/server/mcp/tools/get-bing-performance";
 import { getBacklinksOverviewTool } from "@/server/mcp/tools/get-backlinks-overview";
 import { getBacklinksProfileTool } from "@/server/mcp/tools/get-backlinks-profile";
 import { getDomainKeywordSuggestionsTool } from "@/server/mcp/tools/get-domain-keyword-suggestions";
@@ -315,6 +316,7 @@ export function registerOpenSeoTools(
   register(getSearchConsolePerformanceTool);
   register(inspectUrlsTool);
   register(submitIndexNowUrlsTool);
+  register(getBingPerformanceTool);
   register(listGoogleAnalyticsPropertiesTool);
   register(setGoogleAnalyticsPropertyTool);
   register(getGoogleAnalyticsOrganicLandingPagesTool);

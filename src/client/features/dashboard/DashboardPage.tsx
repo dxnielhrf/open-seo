@@ -25,6 +25,7 @@ import {
   GscCard,
 } from "@/client/features/dashboard/DashboardCards";
 import { Ga4Card } from "@/client/features/dashboard/Ga4Card";
+import { BingCard } from "@/client/features/bing/BingCard";
 import { WorkspaceMergeBanner } from "@/client/features/dashboard/WorkspaceMergeBanner";
 import { QueryError } from "@/client/components/QueryState";
 import {
@@ -200,6 +201,7 @@ export function DashboardPage({
             {ga4Connected || !activation.ga4.cardDismissedAt ? (
               <Ga4Card projectId={projectId} connected={ga4Connected} />
             ) : null}
+            <BingCard projectId={projectId} />
             {overview ? (
               <AuditHealthCard
                 projectId={projectId}

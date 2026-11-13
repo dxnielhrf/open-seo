@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { GoogleConnectionCard } from "@/client/features/integrations/GoogleConnectionCard";
 import { CrawlerAccessSettings } from "@/client/features/settings/CrawlerAccessSettings";
 import { IndexNowSettings } from "@/client/features/settings/IndexNowSettings";
+import { BingSettings } from "@/client/features/bing/BingSettings";
 
 export const Route = createFileRoute(
   "/_app/p/$projectId/settings/integrations",
@@ -35,6 +36,8 @@ function ProjectIntegrationsRoute() {
       <section id="google-analytics" className="scroll-mt-6">
         <GoogleConnectionCard provider="ga4" projectId={projectId} />
       </section>
+
+      <BingSettings projectId={projectId} />
 
       <IndexNowSettings projectId={projectId} />
 

@@ -5,6 +5,7 @@ import { projects } from "@/db/schema";
 import { getAuthMode } from "@/lib/auth-mode";
 import { runSelfhostChecks } from "@/lib/selfhost-preflight";
 import { getOptionalEnvValue } from "@/server/lib/runtime-env";
+import { BingConnectionRepository } from "@/server/features/bing/BingConnectionRepository";
 
 // "error" blocks core functionality; "warn" degrades a feature.
 type SetupCheck = {
@@ -42,6 +43,21 @@ const LEVEL_TO_STATUS = {
   fail: "error",
 } as const;
 
+// Fork (Bing Webmaster Tools): the table exists (its migration ran) and how
+// many projects have a key. Keys are checked when a report loads, not here.
+async function checkBing(): Promise<SetupCheck> {
+  try {
+    const connected = await BingConnectionRepository.countAll();
+    return {
+      status: "ok",
+      detail: `${connected} project${connected === 1 ? "" : "s"} connected to Bing Webmaster Tools.`,
+    };
+  } catch (error) {
+    console.error("health check: bing_connections query failed", error);
+    return { status: "warn", detail: "Bing connections table unavailable." };
+  }
+}
+
 async function checkDatabase(): Promise<SetupCheck> {
   try {
     await db.select({ value: count() }).from(projects);
@@ -78,6 +94,7 @@ export async function getSelfHostSetupStatus(options?: {
   checks.database = options?.skipDatabaseCheck
     ? { status: "ok" }
     : await checkDatabase();
+  if (!options?.skipDatabaseCheck) checks.bing = await checkBing();
 
   return { version, authMode: getAuthMode(env.AUTH_MODE), checks };
 }
