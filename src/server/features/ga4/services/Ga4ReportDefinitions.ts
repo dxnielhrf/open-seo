@@ -1,10 +1,18 @@
 import type { Ga4RunReportRequest } from "@/server/lib/ga4Client";
 
 export type Ga4Channel = "organic_search" | "all";
+// Fork (all GA4 events): breakdowns for the "events" report.
+export type Ga4EventBreakdown =
+  | "event"
+  | "event_and_page"
+  | "event_and_param"
+  | "event_and_source";
+
 export type Ga4ReportKind =
   | "landing_pages"
   | "page_performance"
   | "key_events"
+  | "events"
   | "traffic_acquisition"
   | "ecommerce_performance"
   | "site_search"
@@ -23,6 +31,9 @@ type Ga4ReportRequestInput = {
   ecommerceBreakdown?: "item" | "landing_page";
   ecommerceOnlyWithTransactions?: boolean;
   audienceBreakdown?: "device" | "country" | "new_vs_returning";
+  eventBreakdown?: Ga4EventBreakdown;
+  eventParameter?: string;
+  eventNames?: string[];
 };
 
 const REPORT_DEFINITIONS = {
@@ -54,6 +65,11 @@ const REPORT_DEFINITIONS = {
     dimensions: ["eventName"],
     metrics: ["keyEvents", "totalUsers"],
     orderMetric: "keyEvents",
+  },
+  events: {
+    dimensions: ["eventName"],
+    metrics: ["eventCount", "totalUsers"],
+    orderMetric: "eventCount",
   },
   traffic_acquisition: {
     dimensions: ["sessionDefaultChannelGroup"],
@@ -152,6 +168,14 @@ function reportDimensions(
     ];
   }
   const dimensions = [...defaults];
+  if (input.kind === "events") {
+    const breakdown = input.eventBreakdown ?? "event";
+    if (breakdown === "event_and_page") dimensions.push("pagePath");
+    if (breakdown === "event_and_source") dimensions.push("sessionSourceMedium");
+    if (breakdown === "event_and_param") {
+      dimensions.push(`customEvent:${input.eventParameter ?? ""}`);
+    }
+  }
   if (input.kind === "page_performance" && input.includeDate) {
     dimensions.push("date");
   }
@@ -190,7 +214,20 @@ function reportFilter(input: Ga4ReportRequestInput): unknown {
       },
     };
   }
-  return input.channel === "organic_search" ? organicFilter() : undefined;
+  const channelFilter =
+    input.channel === "organic_search" ? organicFilter() : undefined;
+  if (input.kind === "events" && input.eventNames?.length) {
+    const eventFilter = {
+      filter: {
+        fieldName: "eventName",
+        inListFilter: { values: input.eventNames },
+      },
+    };
+    return channelFilter
+      ? { andGroup: { expressions: [eventFilter, channelFilter] } }
+      : eventFilter;
+  }
+  return channelFilter;
 }
 
 function metricFilter(input: Ga4ReportRequestInput): unknown {
@@ -229,6 +266,7 @@ function effectiveBreakdown(input: Ga4ReportRequestInput): string {
     return input.includeDate ? "page_and_date" : "page";
   }
   if (input.kind === "key_events") return input.breakdown ?? "event";
+  if (input.kind === "events") return input.eventBreakdown ?? "event";
   if (input.kind === "traffic_acquisition") {
     return input.acquisitionBreakdown ?? "channel_group";
   }

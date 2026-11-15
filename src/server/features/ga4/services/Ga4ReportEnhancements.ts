@@ -17,6 +17,9 @@ export function supportsComparison(input: Ga4ReportInput): boolean {
   if (input.kind === "key_events") {
     return (input.breakdown ?? "event") === "event";
   }
+  if (input.kind === "events") {
+    return (input.eventBreakdown ?? "event") === "event";
+  }
   if (input.kind === "traffic_acquisition") {
     return (input.acquisitionBreakdown ?? "channel_group") === "channel_group";
   }

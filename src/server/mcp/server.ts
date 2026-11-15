@@ -55,6 +55,7 @@ import {
   getGoogleAnalyticsAudienceBreakdownTool,
   getGoogleAnalyticsEcommercePerformanceTool,
   getGoogleAnalyticsKeyEventsTool,
+  getGoogleAnalyticsEventsTool,
   getGoogleAnalyticsMeasurementHealthTool,
   getGoogleAnalyticsOrganicLandingPagesTool,
   getGoogleAnalyticsOrganicOverviewTool,
@@ -326,6 +327,7 @@ export function registerOpenSeoTools(
   register(getGoogleAnalyticsOrganicLandingPagesTool);
   register(getGoogleAnalyticsPagePerformanceTool);
   register(getGoogleAnalyticsKeyEventsTool);
+  register(getGoogleAnalyticsEventsTool);
   register(getSearchOpportunitiesTool);
   register(getGoogleAnalyticsOrganicOverviewTool);
   register(getGoogleAnalyticsTrafficAcquisitionTool);

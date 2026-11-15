@@ -329,6 +329,7 @@ const CHANNEL_SELECTABLE_REPORTS = new Set<
 >([
   "page_performance",
   "key_events",
+  "events",
   "ecommerce_performance",
   "audience_breakdown",
 ]);
@@ -615,6 +616,53 @@ export const getGoogleAnalyticsKeyEventsTool = {
     (args) => ({
       ...args,
       kind: "key_events",
+    }),
+  ),
+};
+
+// Fork (all GA4 events): every event, not only key events.
+const eventsInputSchema = z.strictObject({
+  ...commonAnalyticsInputSchema,
+  eventNames: z
+    .array(z.string().min(1).max(40))
+    .max(50)
+    .optional()
+    .describe("Only these event names, e.g. [\"generate_lead\", \"cta_click\"]."),
+  breakdown: z
+    .enum(["event", "event_and_page", "event_and_param", "event_and_source"])
+    .optional()
+    .default("event"),
+  eventParameter: z
+    .string()
+    .optional()
+    .describe(
+      "For breakdown=event_and_param: the event parameter, e.g. lead_source. It must be registered in GA4 as an event-scoped custom dimension.",
+    ),
+  channel: z.enum(["organic_search", "all"]).optional().default("all"),
+  comparePreviousPeriod: z.boolean().optional().default(false),
+});
+type EventsArgs = z.infer<typeof eventsInputSchema>;
+
+export const getGoogleAnalyticsEventsTool = {
+  name: "get_google_analytics_events",
+  config: {
+    title: "Get Google Analytics events",
+    description:
+      "Get all GA4 events (not only key events) with event count and total users: by event, by event and page path, by event and an event parameter (customEvent:<eventParameter>, which must be registered as an event-scoped custom dimension), or by event and session source/medium. Filter with eventNames. All channels by default; set channel to organic_search for Organic Search only. A previous-period comparison is available for the event breakdown. Reads only the project's connected GA4 property. Uses no credits. For key events only, use get_google_analytics_key_events.",
+    inputSchema: eventsInputSchema,
+    outputSchema: reportOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      destructiveHint: false,
+    },
+  },
+  handler: createAnalyticsReportHandler<EventsArgs>(
+    "Events",
+    ({ breakdown, ...args }) => ({
+      ...args,
+      kind: "events",
+      eventBreakdown: breakdown,
     }),
   ),
 };

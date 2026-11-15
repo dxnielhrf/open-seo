@@ -12,6 +12,7 @@ import {
   buildGa4ReportRequest,
   getGa4ReportConfiguration,
   type Ga4Channel,
+  type Ga4EventBreakdown,
   type Ga4ReportKind,
 } from "./Ga4ReportDefinitions";
 import {
@@ -39,6 +40,9 @@ export type Ga4ReportInput = {
   ecommerceBreakdown?: "item" | "landing_page";
   ecommerceOnlyWithTransactions?: boolean;
   audienceBreakdown?: "device" | "country" | "new_vs_returning";
+  eventBreakdown?: Ga4EventBreakdown;
+  eventParameter?: string;
+  eventNames?: string[];
   comparePreviousPeriod?: boolean;
 };
 
@@ -255,10 +259,20 @@ async function runReport(input: Ga4ReportInput, opts: { now?: Date } = {}) {
     connection.propertyTimeZone,
     opts.now,
   );
+  if (
+    input.kind === "events" &&
+    input.eventBreakdown === "event_and_param" &&
+    !/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(input.eventParameter ?? "")
+  ) {
+    throw new Ga4ReportError(
+      "validation_error",
+      "breakdown event_and_param needs eventParameter: the name of an event-scoped custom dimension registered in GA4 (letters, digits, underscores).",
+    );
+  }
   if (input.comparePreviousPeriod && !supportsComparison(input)) {
     throw new Ga4ReportError(
       "validation_error",
-      "Previous-period comparison is only available for event key events, channel-group acquisition, device audiences, and new-versus-returning audiences.",
+      "Previous-period comparison is only available for event key events, events by event, channel-group acquisition, device audiences, and new-versus-returning audiences.",
     );
   }
   const fetchCompleteReport = needsCompleteReport(input);
