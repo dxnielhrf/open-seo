@@ -100,6 +100,15 @@ The standalone compose pulls `${OPENSEO_IMAGE}`. Set in `/opt/open-seo/.env`
 OPENSEO_IMAGE=ghcr.io/dxnielhrf/open-seo-standalone:latest
 ```
 
-then `docker compose pull && docker compose up -d`. The `init` service applies
+then, in `/opt/open-seo/deploy/standalone`:
+
+```bash
+docker compose -f compose.yaml -f compose.lan.yaml pull runtime
+docker compose -f compose.yaml -f compose.lan.yaml up -d
+```
+
+`compose.lan.yaml` (local, untracked) publishes the web port on the LAN for
+the Cloudflare tunnel in CT 100. Without it, web binds to 127.0.0.1 only and
+seo.harfert.org answers 502. The `init` service applies
 migrations. Back out by removing the line (upstream image ignores the extra
 table).
