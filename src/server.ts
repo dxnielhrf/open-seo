@@ -276,6 +276,18 @@ export default {
         );
         console.log("[mcp-oauth] purged expired OAuth data", result);
       }
+      // Fork (Microsoft Clarity): its API keeps only 3 days, so store one
+      // snapshot per connected project each day.
+      try {
+        const { ClarityService } =
+          await import("@/server/features/clarity/ClarityService");
+        const result = await withPgClient(() =>
+          ClarityService.runDailySnapshots(),
+        );
+        console.log("[clarity] daily snapshots", result);
+      } catch (err) {
+        console.error("[cron] Clarity snapshots failed:", err);
+      }
       if (isHostedAuthMode(authMode)) {
         // Daily referral-sale sweep: catches paid Autumn invoices the
         // billing.updated webhook path misses (renewals, one-time top-ups).

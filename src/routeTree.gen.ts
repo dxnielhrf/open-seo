@@ -54,6 +54,7 @@ import { Route as AppPProjectIdAiVisibilityRouteImport } from './routes/_app/p/$
 import { Route as AppPProjectIdBacklinksRouteImport } from './routes/_app/p/$projectId/backlinks'
 import { Route as AppPProjectIdBingRouteImport } from './routes/_app/p/$projectId/bing'
 import { Route as AppPProjectIdBrandLookupRouteImport } from './routes/_app/p/$projectId/brand-lookup'
+import { Route as AppPProjectIdClarityRouteImport } from './routes/_app/p/$projectId/clarity'
 import { Route as AppPProjectIdContextRouteImport } from './routes/_app/p/$projectId/context'
 import { Route as AppPProjectIdDomainRouteImport } from './routes/_app/p/$projectId/domain'
 import { Route as AppPProjectIdKeywordsRouteImport } from './routes/_app/p/$projectId/keywords'
@@ -312,6 +313,11 @@ const AppPProjectIdBrandLookupRoute =
     path: '/brand-lookup',
     getParentRoute: () => AppPProjectIdRouteRoute,
   } as any)
+const AppPProjectIdClarityRoute = AppPProjectIdClarityRouteImport.update({
+  id: '/clarity',
+  path: '/clarity',
+  getParentRoute: () => AppPProjectIdRouteRoute,
+} as any)
 const AppPProjectIdContextRoute = AppPProjectIdContextRouteImport.update({
   id: '/context',
   path: '/context',
@@ -518,6 +524,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/p/$projectId/bing': typeof AppPProjectIdBingRoute
   '/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
+  '/p/$projectId/clarity': typeof AppPProjectIdClarityRoute
   '/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/p/$projectId/domain': typeof AppPProjectIdDomainRoute
   '/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
@@ -588,6 +595,7 @@ export interface FileRoutesByTo {
   '/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/p/$projectId/bing': typeof AppPProjectIdBingRoute
   '/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
+  '/p/$projectId/clarity': typeof AppPProjectIdClarityRoute
   '/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/p/$projectId/domain': typeof AppPProjectIdDomainRoute
   '/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
@@ -662,6 +670,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/_app/p/$projectId/bing': typeof AppPProjectIdBingRoute
   '/_app/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
+  '/_app/p/$projectId/clarity': typeof AppPProjectIdClarityRoute
   '/_app/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/_app/p/$projectId/domain': typeof AppPProjectIdDomainRoute
   '/_app/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
@@ -737,6 +746,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/backlinks'
     | '/p/$projectId/bing'
     | '/p/$projectId/brand-lookup'
+    | '/p/$projectId/clarity'
     | '/p/$projectId/context'
     | '/p/$projectId/domain'
     | '/p/$projectId/keywords'
@@ -807,6 +817,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/backlinks'
     | '/p/$projectId/bing'
     | '/p/$projectId/brand-lookup'
+    | '/p/$projectId/clarity'
     | '/p/$projectId/context'
     | '/p/$projectId/domain'
     | '/p/$projectId/keywords'
@@ -880,6 +891,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/backlinks'
     | '/_app/p/$projectId/bing'
     | '/_app/p/$projectId/brand-lookup'
+    | '/_app/p/$projectId/clarity'
     | '/_app/p/$projectId/context'
     | '/_app/p/$projectId/domain'
     | '/_app/p/$projectId/keywords'
@@ -1258,6 +1270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPProjectIdBrandLookupRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
+    '/_app/p/$projectId/clarity': {
+      id: '/_app/p/$projectId/clarity'
+      path: '/clarity'
+      fullPath: '/p/$projectId/clarity'
+      preLoaderRoute: typeof AppPProjectIdClarityRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
     '/_app/p/$projectId/context': {
       id: '/_app/p/$projectId/context'
       path: '/context'
@@ -1553,6 +1572,7 @@ interface AppPProjectIdRouteRouteChildren {
   AppPProjectIdBacklinksRoute: typeof AppPProjectIdBacklinksRoute
   AppPProjectIdBingRoute: typeof AppPProjectIdBingRoute
   AppPProjectIdBrandLookupRoute: typeof AppPProjectIdBrandLookupRoute
+  AppPProjectIdClarityRoute: typeof AppPProjectIdClarityRoute
   AppPProjectIdContextRoute: typeof AppPProjectIdContextRoute
   AppPProjectIdDomainRoute: typeof AppPProjectIdDomainRoute
   AppPProjectIdKeywordsRoute: typeof AppPProjectIdKeywordsRoute
@@ -1576,6 +1596,7 @@ const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
   AppPProjectIdBacklinksRoute: AppPProjectIdBacklinksRoute,
   AppPProjectIdBingRoute: AppPProjectIdBingRoute,
   AppPProjectIdBrandLookupRoute: AppPProjectIdBrandLookupRoute,
+  AppPProjectIdClarityRoute: AppPProjectIdClarityRoute,
   AppPProjectIdContextRoute: AppPProjectIdContextRoute,
   AppPProjectIdDomainRoute: AppPProjectIdDomainRoute,
   AppPProjectIdKeywordsRoute: AppPProjectIdKeywordsRoute,

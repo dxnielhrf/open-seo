@@ -56,3 +56,48 @@ export const bingConnections = pgTable(
   },
   (table) => [uniqueIndex("bing_connections_project_idx").on(table.projectId)],
 );
+
+// Fork (Microsoft Clarity): see src/db/gsc.schema.ts.
+export const clarityConnections = pgTable(
+  "clarity_connections",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    clarityProjectId: text("clarity_project_id"),
+    encryptedToken: text("encrypted_token").notNull(),
+    connectedByUserId: text("connected_by_user_id").notNull(),
+    lastSnapshotAt: text("last_snapshot_at"),
+    lastError: text("last_error"),
+    createdAt: text("created_at").notNull().default(isoNow),
+    updatedAt: text("updated_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("clarity_connections_project_idx").on(table.projectId),
+  ],
+);
+
+export const claritySnapshots = pgTable(
+  "clarity_snapshots",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    snapshotDate: text("snapshot_date").notNull(),
+    dimension: text("dimension").notNull(),
+    data: text("data").notNull(),
+    fetchedAt: text("fetched_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("clarity_snapshots_day_idx").on(
+      table.projectId,
+      table.snapshotDate,
+      table.dimension,
+    ),
+  ],
+);

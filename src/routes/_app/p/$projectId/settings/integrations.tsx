@@ -5,6 +5,7 @@ import { GoogleConnectionCard } from "@/client/features/integrations/GoogleConne
 import { CrawlerAccessSettings } from "@/client/features/settings/CrawlerAccessSettings";
 import { IndexNowSettings } from "@/client/features/settings/IndexNowSettings";
 import { BingSettings } from "@/client/features/bing/BingSettings";
+import { ClaritySettings } from "@/client/features/clarity/ClaritySettings";
 
 export const Route = createFileRoute(
   "/_app/p/$projectId/settings/integrations",
@@ -38,6 +39,8 @@ function ProjectIntegrationsRoute() {
       </section>
 
       <BingSettings projectId={projectId} />
+
+      <ClaritySettings projectId={projectId} />
 
       <IndexNowSettings projectId={projectId} />
 

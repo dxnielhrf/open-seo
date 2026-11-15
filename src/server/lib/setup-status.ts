@@ -6,6 +6,7 @@ import { getAuthMode } from "@/lib/auth-mode";
 import { runSelfhostChecks } from "@/lib/selfhost-preflight";
 import { getOptionalEnvValue } from "@/server/lib/runtime-env";
 import { BingConnectionRepository } from "@/server/features/bing/BingConnectionRepository";
+import { ClarityRepository } from "@/server/features/clarity/ClarityRepository";
 
 // "error" blocks core functionality; "warn" degrades a feature.
 type SetupCheck = {
@@ -58,6 +59,20 @@ async function checkBing(): Promise<SetupCheck> {
   }
 }
 
+// Fork (Microsoft Clarity): table exists and how many projects have a token.
+async function checkClarity(): Promise<SetupCheck> {
+  try {
+    const connected = await ClarityRepository.countAll();
+    return {
+      status: "ok",
+      detail: `${connected} project${connected === 1 ? "" : "s"} connected to Microsoft Clarity.`,
+    };
+  } catch (error) {
+    console.error("health check: clarity_connections query failed", error);
+    return { status: "warn", detail: "Clarity connections table unavailable." };
+  }
+}
+
 async function checkDatabase(): Promise<SetupCheck> {
   try {
     await db.select({ value: count() }).from(projects);
@@ -95,6 +110,7 @@ export async function getSelfHostSetupStatus(options?: {
     ? { status: "ok" }
     : await checkDatabase();
   if (!options?.skipDatabaseCheck) checks.bing = await checkBing();
+  if (!options?.skipDatabaseCheck) checks.clarity = await checkClarity();
 
   return { version, authMode: getAuthMode(env.AUTH_MODE), checks };
 }

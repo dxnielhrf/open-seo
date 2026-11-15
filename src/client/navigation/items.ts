@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Link2,
   MapPin,
+  MousePointerClick,
   MessageSquare,
   Search,
   SearchCheck,
@@ -55,6 +56,11 @@ const projectNavItems = [
     to: "/p/$projectId/bing" as const,
     label: "Bing Insights",
     icon: SearchCheck,
+  },
+  {
+    to: "/p/$projectId/clarity" as const,
+    label: "Clarity Insights",
+    icon: MousePointerClick,
   },
   {
     to: "/p/$projectId/domain" as const,
@@ -157,6 +163,7 @@ export function getProjectNavGroups(projectId: string) {
       items: [
         byPath("/p/$projectId/search-performance"),
         byPath("/p/$projectId/bing"),
+        byPath("/p/$projectId/clarity"),
         byPath("/p/$projectId/rank-tracking"),
         byPath("/p/$projectId/local-seo"),
         byPath("/p/$projectId/saved"),

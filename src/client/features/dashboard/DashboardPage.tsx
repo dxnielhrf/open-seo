@@ -26,6 +26,7 @@ import {
 } from "@/client/features/dashboard/DashboardCards";
 import { Ga4Card } from "@/client/features/dashboard/Ga4Card";
 import { BingCard } from "@/client/features/bing/BingCard";
+import { ClarityCard } from "@/client/features/clarity/ClarityCard";
 import { WorkspaceMergeBanner } from "@/client/features/dashboard/WorkspaceMergeBanner";
 import { QueryError } from "@/client/components/QueryState";
 import {
@@ -202,6 +203,7 @@ export function DashboardPage({
               <Ga4Card projectId={projectId} connected={ga4Connected} />
             ) : null}
             <BingCard projectId={projectId} />
+            <ClarityCard projectId={projectId} />
             {overview ? (
               <AuditHealthCard
                 projectId={projectId}

@@ -63,3 +63,60 @@ export const bingConnections = sqliteTable(
   },
   (table) => [uniqueIndex("bing_connections_project_idx").on(table.projectId)],
 );
+
+// Fork (Microsoft Clarity): one Clarity project per OpenSEO project. The Data
+// Export token is encrypted with BETTER_AUTH_SECRET and never returned to the
+// client. Clarity only serves the last 1-3 days, so a daily cron stores
+// snapshots in clarity_snapshots.
+export const clarityConnections = sqliteTable(
+  "clarity_connections",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    // Label only (the token is already scoped to one Clarity project).
+    clarityProjectId: text("clarity_project_id"),
+    encryptedToken: text("encrypted_token").notNull(),
+    connectedByUserId: text("connected_by_user_id").notNull(),
+    lastSnapshotAt: text("last_snapshot_at"),
+    lastError: text("last_error"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("clarity_connections_project_idx").on(table.projectId),
+  ],
+);
+
+// One row per project, UTC fetch day and dimension ("" = site totals). `data`
+// is Clarity's raw JSON answer for the 24 hours before `fetched_at`.
+export const claritySnapshots = sqliteTable(
+  "clarity_snapshots",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    snapshotDate: text("snapshot_date").notNull(),
+    dimension: text("dimension").notNull(),
+    data: text("data").notNull(),
+    fetchedAt: text("fetched_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("clarity_snapshots_day_idx").on(
+      table.projectId,
+      table.snapshotDate,
+      table.dimension,
+    ),
+  ],
+);
