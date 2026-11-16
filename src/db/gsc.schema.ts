@@ -1,4 +1,10 @@
-import { sqliteTable, text, uniqueIndex, index } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  uniqueIndex,
+  index,
+  integer,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 import { organization } from "./better-auth-schema";
 import { projects } from "./app.schema";
@@ -117,6 +123,53 @@ export const claritySnapshots = sqliteTable(
       table.projectId,
       table.snapshotDate,
       table.dimension,
+    ),
+  ],
+);
+
+// Fork (server logs): one ingest token per project (SHA-256 hash only) for the
+// script that aggregates the web server's access logs and posts daily totals.
+export const serverLogSources = sqliteTable(
+  "server_log_sources",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    lastIngestAt: text("last_ingest_at"),
+    lastIngestDate: text("last_ingest_date"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("server_log_sources_project_idx").on(table.projectId),
+    uniqueIndex("server_log_sources_token_idx").on(table.tokenHash),
+  ],
+);
+
+// Daily hits per path, status and bot class. No IPs, user agents or referrers.
+export const serverLogDaily = sqliteTable(
+  "server_log_daily",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    path: text("path").notNull(),
+    status: integer("status").notNull(),
+    bot: text("bot").notNull(),
+    hits: integer("hits").notNull(),
+  },
+  (table) => [
+    uniqueIndex("server_log_daily_row_idx").on(
+      table.projectId,
+      table.date,
+      table.path,
+      table.status,
+      table.bot,
     ),
   ],
 );

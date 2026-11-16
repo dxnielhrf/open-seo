@@ -7,6 +7,7 @@ import { runSelfhostChecks } from "@/lib/selfhost-preflight";
 import { getOptionalEnvValue } from "@/server/lib/runtime-env";
 import { BingConnectionRepository } from "@/server/features/bing/BingConnectionRepository";
 import { ClarityRepository } from "@/server/features/clarity/ClarityRepository";
+import { ServerLogRepository } from "@/server/features/server-logs/ServerLogRepository";
 
 // "error" blocks core functionality; "warn" degrades a feature.
 type SetupCheck = {
@@ -73,6 +74,20 @@ async function checkClarity(): Promise<SetupCheck> {
   }
 }
 
+// Fork (server logs): table exists and how many projects send logs.
+async function checkServerLogs(): Promise<SetupCheck> {
+  try {
+    const connected = await ServerLogRepository.countAll();
+    return {
+      status: "ok",
+      detail: `${connected} project${connected === 1 ? "" : "s"} with a server log token.`,
+    };
+  } catch (error) {
+    console.error("health check: server_log_sources query failed", error);
+    return { status: "warn", detail: "Server log tables unavailable." };
+  }
+}
+
 async function checkDatabase(): Promise<SetupCheck> {
   try {
     await db.select({ value: count() }).from(projects);
@@ -111,6 +126,7 @@ export async function getSelfHostSetupStatus(options?: {
     : await checkDatabase();
   if (!options?.skipDatabaseCheck) checks.bing = await checkBing();
   if (!options?.skipDatabaseCheck) checks.clarity = await checkClarity();
+  if (!options?.skipDatabaseCheck) checks.serverLogs = await checkServerLogs();
 
   return { version, authMode: getAuthMode(env.AUTH_MODE), checks };
 }

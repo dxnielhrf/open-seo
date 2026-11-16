@@ -114,6 +114,8 @@ export const {
   bingConnections,
   clarityConnections,
   claritySnapshots,
+  serverLogSources,
+  serverLogDaily,
   projectContextSections,
   projectCompetitors,
   projectKeyPages,

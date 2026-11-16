@@ -69,6 +69,11 @@ const projectNavItems = [
     icon: ListChecks,
   },
   {
+    to: "/p/$projectId/server-logs" as const,
+    label: "Server Logs",
+    icon: Bot,
+  },
+  {
     to: "/p/$projectId/domain" as const,
     label: "Domain Overview",
     icon: Globe,
@@ -171,6 +176,7 @@ export function getProjectNavGroups(projectId: string) {
         byPath("/p/$projectId/bing"),
         byPath("/p/$projectId/clarity"),
         byPath("/p/$projectId/ga4-events"),
+        byPath("/p/$projectId/server-logs"),
         byPath("/p/$projectId/rank-tracking"),
         byPath("/p/$projectId/local-seo"),
         byPath("/p/$projectId/saved"),

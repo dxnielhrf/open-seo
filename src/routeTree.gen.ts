@@ -45,6 +45,7 @@ import { Route as AppSettingsOrganizationRouteImport } from './routes/_app/setti
 import { Route as AuthenticatedOnboardingIndexRouteImport } from './routes/_authenticated.onboarding.index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAutumnSplatRouteImport } from './routes/api/autumn/$'
+import { Route as ApiForkServerLogsRouteImport } from './routes/api/fork/server-logs'
 import { Route as ReportMapGrantCopyrightRouteImport } from './routes/report-map/$grant/copyright'
 import { Route as STokenIndexRouteImport } from './routes/s/$token/index'
 import { Route as STokenOgDotpngRouteImport } from './routes/s/$token/og[.]png'
@@ -65,6 +66,7 @@ import { Route as AppPProjectIdRankTrackingRouteImport } from './routes/_app/p/$
 import { Route as AppPProjectIdSamRouteImport } from './routes/_app/p/$projectId/sam'
 import { Route as AppPProjectIdSavedRouteImport } from './routes/_app/p/$projectId/saved'
 import { Route as AppPProjectIdSearchPerformanceRouteImport } from './routes/_app/p/$projectId/search-performance'
+import { Route as AppPProjectIdServerLogsRouteImport } from './routes/_app/p/$projectId/server-logs'
 import { Route as AppPProjectIdSettingsRouteImport } from './routes/_app/p/$projectId/settings'
 import { Route as ApiGa4OauthCallbackRouteImport } from './routes/api/ga4/oauth/callback'
 import { Route as ApiGscOauthCallbackRouteImport } from './routes/api/gsc/oauth/callback'
@@ -267,6 +269,11 @@ const ApiAutumnSplatRoute = ApiAutumnSplatRouteImport.update({
   path: '/api/autumn/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiForkServerLogsRoute = ApiForkServerLogsRouteImport.update({
+  id: '/api/fork/server-logs',
+  path: '/api/fork/server-logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportMapGrantCopyrightRoute = ReportMapGrantCopyrightRouteImport.update({
   id: '/report-map/$grant/copyright',
   path: '/report-map/$grant/copyright',
@@ -372,6 +379,11 @@ const AppPProjectIdSearchPerformanceRoute =
     path: '/search-performance',
     getParentRoute: () => AppPProjectIdRouteRoute,
   } as any)
+const AppPProjectIdServerLogsRoute = AppPProjectIdServerLogsRouteImport.update({
+  id: '/server-logs',
+  path: '/server-logs',
+  getParentRoute: () => AppPProjectIdRouteRoute,
+} as any)
 const AppPProjectIdSettingsRoute = AppPProjectIdSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -520,6 +532,7 @@ export interface FileRoutesByFullPath {
   '/settings/organization': typeof AppSettingsOrganizationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/autumn/$': typeof ApiAutumnSplatRoute
+  '/api/fork/server-logs': typeof ApiForkServerLogsRoute
   '/report-map/$grant/copyright': typeof ReportMapGrantCopyrightRoute
   '/s/$token/og.png': typeof STokenOgDotpngRoute
   '/s/$token/raw': typeof STokenRawRoute
@@ -541,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/sam': typeof AppPProjectIdSamRoute
   '/p/$projectId/saved': typeof AppPProjectIdSavedRoute
   '/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
+  '/p/$projectId/server-logs': typeof AppPProjectIdServerLogsRoute
   '/p/$projectId/settings': typeof AppPProjectIdSettingsRouteWithChildren
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
@@ -593,6 +607,7 @@ export interface FileRoutesByTo {
   '/settings/organization': typeof AppSettingsOrganizationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/autumn/$': typeof ApiAutumnSplatRoute
+  '/api/fork/server-logs': typeof ApiForkServerLogsRoute
   '/report-map/$grant/copyright': typeof ReportMapGrantCopyrightRoute
   '/s/$token/og.png': typeof STokenOgDotpngRoute
   '/s/$token/raw': typeof STokenRawRoute
@@ -611,6 +626,7 @@ export interface FileRoutesByTo {
   '/p/$projectId/sam': typeof AppPProjectIdSamRoute
   '/p/$projectId/saved': typeof AppPProjectIdSavedRoute
   '/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
+  '/p/$projectId/server-logs': typeof AppPProjectIdServerLogsRoute
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/p/$projectId': typeof AppPProjectIdIndexRoute
@@ -668,6 +684,7 @@ export interface FileRoutesById {
   '/_app/settings/organization': typeof AppSettingsOrganizationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/autumn/$': typeof ApiAutumnSplatRoute
+  '/api/fork/server-logs': typeof ApiForkServerLogsRoute
   '/report-map/$grant/copyright': typeof ReportMapGrantCopyrightRoute
   '/s/$token/og.png': typeof STokenOgDotpngRoute
   '/s/$token/raw': typeof STokenRawRoute
@@ -689,6 +706,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/sam': typeof AppPProjectIdSamRoute
   '/_app/p/$projectId/saved': typeof AppPProjectIdSavedRoute
   '/_app/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
+  '/_app/p/$projectId/server-logs': typeof AppPProjectIdServerLogsRoute
   '/_app/p/$projectId/settings': typeof AppPProjectIdSettingsRouteWithChildren
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
@@ -745,6 +763,7 @@ export interface FileRouteTypes {
     | '/settings/organization'
     | '/api/auth/$'
     | '/api/autumn/$'
+    | '/api/fork/server-logs'
     | '/report-map/$grant/copyright'
     | '/s/$token/og.png'
     | '/s/$token/raw'
@@ -766,6 +785,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/sam'
     | '/p/$projectId/saved'
     | '/p/$projectId/search-performance'
+    | '/p/$projectId/server-logs'
     | '/p/$projectId/settings'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
@@ -818,6 +838,7 @@ export interface FileRouteTypes {
     | '/settings/organization'
     | '/api/auth/$'
     | '/api/autumn/$'
+    | '/api/fork/server-logs'
     | '/report-map/$grant/copyright'
     | '/s/$token/og.png'
     | '/s/$token/raw'
@@ -836,6 +857,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/sam'
     | '/p/$projectId/saved'
     | '/p/$projectId/search-performance'
+    | '/p/$projectId/server-logs'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
     | '/p/$projectId'
@@ -892,6 +914,7 @@ export interface FileRouteTypes {
     | '/_app/settings/organization'
     | '/api/auth/$'
     | '/api/autumn/$'
+    | '/api/fork/server-logs'
     | '/report-map/$grant/copyright'
     | '/s/$token/og.png'
     | '/s/$token/raw'
@@ -913,6 +936,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/sam'
     | '/_app/p/$projectId/saved'
     | '/_app/p/$projectId/search-performance'
+    | '/_app/p/$projectId/server-logs'
     | '/_app/p/$projectId/settings'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
@@ -955,6 +979,7 @@ export interface RootRouteChildren {
   StripeProjectsLoginRoute: typeof StripeProjectsLoginRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAutumnSplatRoute: typeof ApiAutumnSplatRoute
+  ApiForkServerLogsRoute: typeof ApiForkServerLogsRoute
   ReportMapGrantCopyrightRoute: typeof ReportMapGrantCopyrightRoute
   STokenOgDotpngRoute: typeof STokenOgDotpngRoute
   STokenRawRoute: typeof STokenRawRoute
@@ -1219,6 +1244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAutumnSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/fork/server-logs': {
+      id: '/api/fork/server-logs'
+      path: '/api/fork/server-logs'
+      fullPath: '/api/fork/server-logs'
+      preLoaderRoute: typeof ApiForkServerLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/report-map/$grant/copyright': {
       id: '/report-map/$grant/copyright'
       path: '/report-map/$grant/copyright'
@@ -1357,6 +1389,13 @@ declare module '@tanstack/react-router' {
       path: '/search-performance'
       fullPath: '/p/$projectId/search-performance'
       preLoaderRoute: typeof AppPProjectIdSearchPerformanceRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
+    '/_app/p/$projectId/server-logs': {
+      id: '/_app/p/$projectId/server-logs'
+      path: '/server-logs'
+      fullPath: '/p/$projectId/server-logs'
+      preLoaderRoute: typeof AppPProjectIdServerLogsRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
     '/_app/p/$projectId/settings': {
@@ -1602,6 +1641,7 @@ interface AppPProjectIdRouteRouteChildren {
   AppPProjectIdSamRoute: typeof AppPProjectIdSamRoute
   AppPProjectIdSavedRoute: typeof AppPProjectIdSavedRoute
   AppPProjectIdSearchPerformanceRoute: typeof AppPProjectIdSearchPerformanceRoute
+  AppPProjectIdServerLogsRoute: typeof AppPProjectIdServerLogsRoute
   AppPProjectIdSettingsRoute: typeof AppPProjectIdSettingsRouteWithChildren
   AppPProjectIdIndexRoute: typeof AppPProjectIdIndexRoute
   AppPProjectIdReportsReportIdRoute: typeof AppPProjectIdReportsReportIdRoute
@@ -1627,6 +1667,7 @@ const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
   AppPProjectIdSamRoute: AppPProjectIdSamRoute,
   AppPProjectIdSavedRoute: AppPProjectIdSavedRoute,
   AppPProjectIdSearchPerformanceRoute: AppPProjectIdSearchPerformanceRoute,
+  AppPProjectIdServerLogsRoute: AppPProjectIdServerLogsRoute,
   AppPProjectIdSettingsRoute: AppPProjectIdSettingsRouteWithChildren,
   AppPProjectIdIndexRoute: AppPProjectIdIndexRoute,
   AppPProjectIdReportsReportIdRoute: AppPProjectIdReportsReportIdRoute,
@@ -1720,6 +1761,7 @@ const rootRouteChildren: RootRouteChildren = {
   StripeProjectsLoginRoute: StripeProjectsLoginRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAutumnSplatRoute: ApiAutumnSplatRoute,
+  ApiForkServerLogsRoute: ApiForkServerLogsRoute,
   ReportMapGrantCopyrightRoute: ReportMapGrantCopyrightRoute,
   STokenOgDotpngRoute: STokenOgDotpngRoute,
   STokenRawRoute: STokenRawRoute,

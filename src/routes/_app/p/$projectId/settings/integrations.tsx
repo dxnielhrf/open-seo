@@ -6,6 +6,7 @@ import { CrawlerAccessSettings } from "@/client/features/settings/CrawlerAccessS
 import { IndexNowSettings } from "@/client/features/settings/IndexNowSettings";
 import { BingSettings } from "@/client/features/bing/BingSettings";
 import { ClaritySettings } from "@/client/features/clarity/ClaritySettings";
+import { ServerLogSettings } from "@/client/features/server-logs/ServerLogSettings";
 
 export const Route = createFileRoute(
   "/_app/p/$projectId/settings/integrations",
@@ -41,6 +42,8 @@ function ProjectIntegrationsRoute() {
       <BingSettings projectId={projectId} />
 
       <ClaritySettings projectId={projectId} />
+
+      <ServerLogSettings projectId={projectId} />
 
       <IndexNowSettings projectId={projectId} />
 

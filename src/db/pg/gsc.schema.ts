@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { index, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  pgTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { organization } from "./better-auth-schema";
 import { projects } from "./app.schema";
 
@@ -98,6 +104,49 @@ export const claritySnapshots = pgTable(
       table.projectId,
       table.snapshotDate,
       table.dimension,
+    ),
+  ],
+);
+
+// Fork (server logs): see src/db/gsc.schema.ts.
+export const serverLogSources = pgTable(
+  "server_log_sources",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    lastIngestAt: text("last_ingest_at"),
+    lastIngestDate: text("last_ingest_date"),
+    createdAt: text("created_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("server_log_sources_project_idx").on(table.projectId),
+    uniqueIndex("server_log_sources_token_idx").on(table.tokenHash),
+  ],
+);
+
+export const serverLogDaily = pgTable(
+  "server_log_daily",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    path: text("path").notNull(),
+    status: integer("status").notNull(),
+    bot: text("bot").notNull(),
+    hits: integer("hits").notNull(),
+  },
+  (table) => [
+    uniqueIndex("server_log_daily_row_idx").on(
+      table.projectId,
+      table.date,
+      table.path,
+      table.status,
+      table.bot,
     ),
   ],
 );
