@@ -63,15 +63,16 @@ function Ga4EventsRoute() {
               {item.label}
             </Button>
           ))}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              setChannel(channel === "all" ? "organic_search" : "all")
-            }
-          >
-            {channel === "all" ? "All channels" : "Organic Search"}
-          </Button>
+          {(["all", "organic_search"] as const).map((c) => (
+            <Button
+              key={c}
+              size="sm"
+              variant={c === channel ? "default" : "outline"}
+              onClick={() => setChannel(c)}
+            >
+              {c === "all" ? "All channels" : "Organic Search"}
+            </Button>
+          ))}
         </div>
         {breakdown === "event_and_param" ? (
           <form

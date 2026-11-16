@@ -71,9 +71,16 @@ function ServerLogsRoute() {
               {b.label}
             </Button>
           ))}
-          <Button size="sm" variant="outline" onClick={() => setAiOnly(!aiOnly)}>
-            {aiOnly ? "AI crawlers only" : "All visitors"}
-          </Button>
+          {[true, false].map((ai) => (
+            <Button
+              key={String(ai)}
+              size="sm"
+              variant={ai === aiOnly ? "default" : "outline"}
+              onClick={() => setAiOnly(ai)}
+            >
+              {ai ? "AI crawlers" : "All visitors"}
+            </Button>
+          ))}
           {STATUSES.map((s) => (
             <Button
               key={s}
