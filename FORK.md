@@ -127,3 +127,15 @@ the Cloudflare tunnel in CT 100. Without it, web binds to 127.0.0.1 only and
 seo.harfert.org answers 502. The `init` service applies
 migrations. Back out by removing the line (upstream image ignores the extra
 table).
+
+## Server log script on CT 122
+
+- Script: `/opt/open-seo-logs/server-logs.py` (copy of `scripts/fork/server-logs.py`;
+  update it with `curl` from the fork after changes).
+- Timer: `openseo-server-logs.timer`, daily 02:30, posts the last 7 days to
+  `http://127.0.0.1:3001/api/fork/server-logs`. Token in `/etc/open-seo-logs.env`
+  (mode 600). Run now: `systemctl start openseo-server-logs.service`, log:
+  `journalctl -u openseo-server-logs.service`.
+- SSH: host alias `kas-logs` in `/root/.ssh/config`, key `/root/.ssh/kas_logs`.
+  On KAS the key is restricted (`restrict,command=…`) to `cat` of
+  `/www/htdocs/w0222de1/logs/access_log_vertion_de_YYYY-MM-DD.gz`.
